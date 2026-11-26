@@ -1,0 +1,4 @@
+Options -Indexes
+<FilesMatch "^(README\.md|\.env|.*\.sql)$">
+    Require all denied
+</FilesMatch>
