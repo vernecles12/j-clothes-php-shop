@@ -25,6 +25,21 @@ function db(): PDO
         initialize_database($pdo);
         return $pdo;
     } catch (PDOException $e) {
+        $mysqlConfigured = getenv('JC_DB_HOST') !== false && trim((string) getenv('JC_DB_HOST')) !== '';
+        if (!$mysqlConfigured) {
+            try {
+                $sqliteFile = sys_get_temp_dir() . '/j-clothes.sqlite';
+                $pdo = new PDO('sqlite:' . $sqliteFile, null, null, [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                ]);
+                initialize_sqlite_database($pdo);
+                return $pdo;
+            } catch (Throwable $sqliteError) {
+                http_response_code(500);
+                exit('<main style="font-family:Arial,sans-serif;padding:40px"><h1>J Clothes database unavailable</h1><p>Configure MySQL or enable SQLite on this server.</p></main>');
+            }
+        }
         http_response_code(500);
         $safeMessage = htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8');
         exit('<main style="font-family:Arial,sans-serif;max-width:760px;margin:60px auto;padding:24px;color:#20352b"><h1>J Clothes database connection failed</h1><p>Check that MySQL is running and that the database settings in <code>config/config.php</code> match your environment.</p><p><strong>Technical details:</strong> ' . $safeMessage . '</p><p>For XAMPP, start Apache and MySQL, then confirm that the <code>pdo_mysql</code> PHP extension is enabled.</p></main>');
@@ -101,5 +116,60 @@ function initialize_database(PDO $pdo): void
         } else {
             $insert->execute(array_slice($product, 0, 7));
         }
+    }
+}
+
+function initialize_sqlite_database(PDO $pdo): void
+{
+    $pdo->exec("CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL UNIQUE,
+        password_hash TEXT NOT NULL,
+        login_count INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )");
+    $pdo->exec("CREATE TABLE IF NOT EXISTS products (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        category TEXT NOT NULL,
+        description TEXT NOT NULL,
+        price REAL NOT NULL,
+        rating REAL NOT NULL DEFAULT 4.8,
+        image TEXT NOT NULL,
+        is_featured INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )");
+    $pdo->exec("CREATE TABLE IF NOT EXISTS orders (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        total REAL NOT NULL,
+        status TEXT NOT NULL DEFAULT 'Placed',
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+    )");
+    $pdo->exec("CREATE TABLE IF NOT EXISTS order_items (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        order_id INTEGER NOT NULL,
+        product_id INTEGER NOT NULL,
+        product_name TEXT NOT NULL,
+        quantity INTEGER NOT NULL,
+        unit_price REAL NOT NULL
+    )");
+
+    $count = (int) $pdo->query('SELECT COUNT(*) FROM products')->fetchColumn();
+    if ($count === 0) {
+        $products = [
+            ['Blue Knit Sweater', 'Everyday essentials', 'A soft blue crewneck sweater with ribbed cuffs and a relaxed everyday fit.', 899.00, 4.9, 'linen-shirt.jpg', 1],
+            ['Floral Sleeve Kimono Jacket', 'Modern classics', 'A navy kimono-style jacket with detailed floral sleeve accents.', 549.00, 4.8, 'sage-tee.jpg', 1],
+            ['Graphic Pocket Shirt', 'Modern classics', 'A lightweight white short-sleeve shirt with contrast portrait pocket artwork.', 1199.00, 4.9, 'trousers.jpg', 1],
+            ['Embroidered Woven Shirt', 'Everyday essentials', 'A blue woven shirt featuring textured panels and embroidered trim.', 999.00, 4.7, 'knit-top.jpg', 0],
+            ['Ombre T-Shirt and Shorts Set', 'Everyday essentials', 'A coordinated yellow-to-navy ombre tee and shorts set with a casual relaxed shape.', 399.00, 4.8, 'tote.jpg', 0],
+            ['Classic White Short-Sleeve Shirt', 'Modern classics', 'A crisp white short-sleeve shirt with a clean button-front finish.', 1699.00, 5.0, 'utility-jacket.jpg', 0],
+            ['Pink Rabbit Hoodie', 'Everyday essentials', 'A cozy pink rabbit-print hoodie with a soft long-sleeve silhouette.', 799.00, 4.8, 'white-shirt.jpg', 0],
+            ['Oversized Denim Jacket', 'Outerwear', 'A structured oversized denim jacket with a washed blue finish.', 649.00, 4.9, 'pink-hoodie.jpg', 0],
+            ['Beige Leather Tote Bag', 'Accessories', 'A roomy beige tote with dark leather-look handles and everyday carry space.', 1499.00, 4.9, 'denim-jacket.jpg', 0],
+        ];
+        $stmt = $pdo->prepare('INSERT INTO products (name, category, description, price, rating, image, is_featured) VALUES (?, ?, ?, ?, ?, ?, ?)');
+        foreach ($products as $product) $stmt->execute($product);
     }
 }
