@@ -12,7 +12,7 @@ include __DIR__ . '/includes/header.php';
         <p class="eyebrow"><span class="eyebrow-line"></span> CONSIDERED CLOTHING · EVERYDAY COMFORT</p>
         <h1>Feel good in<br><em>what you wear.</em></h1>
         <p class="hero-copy">Easy pieces, earthy tones, and thoughtful details. Find the kind of everyday style that feels naturally yours.</p>
-        <div class="hero-actions"><a class="button button-light" href="#shop">Explore the collection <span>↗</span></a><a class="text-link" href="#about">A little about us <span>↓</span></a></div>
+        <div class="hero-actions"><a class="button button-light" href="shop.php">Explore the collection <span>↗</span></a><a class="text-link" href="#about">A little about us <span>↓</span></a></div>
         <div class="hero-note"><span>01 / 03</span><span>MADE FOR YOUR EVERYDAY</span></div>
     </div>
     <div class="hero-side-label">J CLOTHES — EST. 2026</div>

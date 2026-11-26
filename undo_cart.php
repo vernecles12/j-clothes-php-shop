@@ -17,5 +17,5 @@ if ($id && isset($_SESSION['cart'][$id])) {
 } else {
     set_flash('There is no item to undo.', 'error');
 }
-header('Location: ' . ($_SERVER['HTTP_REFERER'] ?? 'index.php#shop'));
+header('Location: ' . ($_SERVER['HTTP_REFERER'] ?? 'shop.php'));
 exit;

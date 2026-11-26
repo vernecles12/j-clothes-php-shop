@@ -9,7 +9,7 @@ if ($id) {
     $product = $stmt->fetch();
 }
 if (!$product) {
-    header('Location: index.php#shop');
+    header('Location: shop.php');
     exit;
 }
 
@@ -38,7 +38,7 @@ shuffle($comments);
             <img src="assets/images/<?= e($product['image']) ?>" alt="<?= e($product['name']) ?>">
         </div>
         <div class="product-detail-info">
-            <a class="back-link" href="index.php#shop">← Back to the shop</a>
+            <a class="back-link" href="shop.php">← Back to the shop</a>
             <p class="eyebrow dark-eyebrow"><?= e($product['category']) ?></p>
             <h1><?= e($product['name']) ?></h1>
             <div class="detail-rating"><span class="stars">★★★★★</span> <strong><?= number_format((float) $product['rating'], 1) ?></strong> <span>(<?= 18 + (($seed * 7) % 83) ?> verified reviews)</span></div>

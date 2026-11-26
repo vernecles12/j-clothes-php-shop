@@ -26,7 +26,7 @@ $flash = get_flash();
         <a class="brand" href="<?= e((str_contains($_SERVER['PHP_SELF'], '/auth/')) ? '../index.php' : 'index.php') ?>" aria-label="J Clothes home"><span class="brand-mark">J</span><span>J CLOTHES<small>wear well, live well</small></span></a>
         <button class="menu-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false"><span></span><span></span></button>
         <nav class="main-nav" aria-label="Main navigation">
-            <a href="<?= e((str_contains($_SERVER['PHP_SELF'], '/auth/')) ? '../index.php#shop' : 'index.php#shop') ?>">Shop</a>
+            <a href="<?= e((str_contains($_SERVER['PHP_SELF'], '/auth/')) ? '../shop.php' : 'shop.php') ?>">Shop</a>
             <a href="<?= e((str_contains($_SERVER['PHP_SELF'], '/auth/')) ? '../index.php#about' : 'index.php#about') ?>">Our story</a>
             <a href="<?= e((str_contains($_SERVER['PHP_SELF'], '/auth/')) ? '../index.php#contact' : 'index.php#contact') ?>">Contact</a>
         </nav>
